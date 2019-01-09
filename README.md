@@ -1,27 +1,62 @@
-# AxonFrontendSui
+# Frontend for business platform Annette Axon (using Semantic UI)
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.1.2.
 
-## Development server
+> An **axon** or nerve fiber, is a long, slender projection of a nerve cell, or neuron, in vertebrates, that typically conducts electrical impulses known as action potentials, away from the nerve cell body. The function of the axon is to transmit information to different neurons, muscles, and glands.
+>
+> [*Wikipedia*](https://en.wikipedia.org/wiki/Axon)
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+Annette Axon is the business process management system integrated with project management system. 
+Annette Axon helps companies to define, execute and control their non-project and project business processes. 
+The platform implements the following functionality:
 
-## Code scaffolding
+* flexible business processes based on BPM engine (Camunda BPM)
+* organisational structure of one or more companies and project team structures
+* content management based on CMIS engine (Alfresco ECM)
+* project system with Gantt diagram representation of WBS (work breakdown structure)
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## Getting started
 
-## Build
+Clone repository from GitHub:
+```bash
+$ git clone https://github.com/valerylobachev/axon-frontend-angular.git
+```
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+Install the following software:
+* `node.js` and `npm` (see [Node.js](https://nodejs.org) site)
 
-## Running unit tests
+Install Angular CLI:
+```bash
+$ npm install -g @angular/cli
+```
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+Download and install dependencies for frontend application:
+```bash
+$ npm install
+```
 
-## Running end-to-end tests
+Build frontend application:
+```bash
+$ ng build
+```
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+Build and run backend application:
+```bash
+$ cd ../annette-axon
+$ sbt runAll
+```
 
-## Further help
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+## Contributing
+
+Contributions are *very* welcome!
+
+If you see an issue that you'd like to see fixed, the best way to make it happen is to help out by submitting a pull request implementing it.
+
+Refer to the [CONTRIBUTING.md](docs/CONTRIBUTING.md) and  [CODE_OF_CONDUCT.md](docs/CODE_OF_CONDUCT.md) file for more
+ details about the workflow, and general hints on how to prepare your pull request. You can also ask for 
+ clarifications or guidance in GitHub issues.
+
+
+## License
+
+Annette Axon is Open Source and available under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0)

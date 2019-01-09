@@ -1,0 +1,35 @@
+<table [class]="'ui table ' + (options.size || '') + ' ' + (options.color || '')"
+       [class.celled]="options.celled || false"
+       [class.striped]="options.striped || false"
+       [class.unstackable]="options.unstackable || false"
+       [class.selectable]="options.selectable || false"
+       [class.collapsing]="options.collapsing || false"
+       [class.inverted]="options.inverted || false"
+       [class.sortable]="options.sortable || false"
+       [class.padded]="options.padded || false"
+       [class.compact]="options.compact || false"
+>
+  <thead>
+  <tr>
+    <th *ngFor="let column of columns"
+        [class.sorted]="options.sortable && column.field === orderField"
+        [class.ascending]="options.sortable && column.field === orderField && ascending "
+        [class.descending]="options.sortable && column.field === orderField && !ascending"
+        [style.width]="column.width || 'auto'" [style.cursor]="options.selectable ? 'pointer' : 'auto' "
+        (click)="toggleSort($event, column)">
+      {{column.caption}}
+
+    </th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let item of dataToDisplay" [style.cursor]="options.selectable ? 'pointer' : 'auto' "
+      (click)="onSelect(item)" [class.active]="item == selectedItem">
+    <td *ngFor="let column of columns" [class]="column['bool'] ? 'ui center aligned' : '' ">
+     <span *ngIf="!column['bool']"> {{item[column.field]}} </span>
+     <i class="checkmark icon " *ngIf="column['bool'] && item[column.field]"></i>
+     <i class="remove icon " *ngIf="column['bool'] && !item[column.field]"></i>
+    </td>
+  </tr>
+  </tbody>
+</table>       

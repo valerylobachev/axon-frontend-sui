@@ -1,0 +1,73 @@
+<div class="ui equal width left aligned padded grid stackable">
+  <div class="row">
+    <div class="sixteen wide column">
+      <div class="ui segments">
+        <div class="ui segment">
+          <h3 class="header">{{ 'axon.bpm-config.schemas' | translate }}</h3>
+        </div>
+        <div class="ui segment">
+          <div class="ui stackable grid">
+            <div class="row">
+              <div class="fourteen wide column">
+                <div class="ui icon input" style="width: 100%;">
+                  <input type="text" placeholder="Filter..." [value]="filter" [formControl]="filterControl">
+                  <i class=" close link icon"
+                     style="right: 1.6em; width: 2em;"
+                     (click)="clearFilter()"></i>
+                  <i class=" search link icon"
+                     style="width: 2em;"
+                     (click)="$event.stopPropagation(); refresh()"></i>
+                </div>
+              </div>
+              <div class="two wide column">
+                <a class="ui primary button" routerLink="../schema/create/new">Create</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="ui segment">
+
+          <div class="ui negative message" *ngIf="loadingFailure">
+            <p> {{ loadingFailure.code | translate: loadingFailure }}</p>
+          </div>
+
+          <table class="ui fixed single line striped table" *ngIf="!loadingFailure">
+            <thead>
+            <tr>
+              <th>Id</th>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Notation</th>
+              <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let schema of schemas">
+              <td>{{ schema.id }}</td>
+              <td>{{ schema.name }}</td>
+              <td>{{ schema.description }}</td>
+              <td>{{ schema.notation }}</td>
+              <td>
+
+                <a class="ui tiny basic icon button" [routerLink]="['../schema/view', schema.id]">
+                  <i class="eye green icon"></i>
+                </a>
+                <a class="ui tiny basic icon button" [routerLink]="['../schema/update', schema.id]">
+                  <i class="edit blue icon" ></i>
+                </a>
+                <button class="ui tiny basic icon button">
+                  <i class="upload violet icon"  ></i>
+                </button>
+                <button class="ui tiny basic icon button" (click)="delete(schema.id)">
+                  <i class="delete red icon"></i>
+                </button>
+
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

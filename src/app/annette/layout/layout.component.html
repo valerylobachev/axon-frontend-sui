@@ -1,0 +1,17 @@
+<!--<ngx-loading-bar color="#009688"></ngx-loading-bar>-->
+<app-header (toggleSidebar)="toggleSidebar()"></app-header>
+<div class="app-container">
+
+
+  <app-sidebar *ngIf="sidebarVisible">
+    <app-menu [menuItems]="menuItems"></app-menu>
+  </app-sidebar>
+  <div
+    [ngClass]="{'sidebar-margin': sidebarVisible}"
+    [perfectScrollbar]="config"
+    [disabled]="mediaMatcher.matches">
+    <router-outlet></router-outlet>
+  </div>
+
+
+</div>

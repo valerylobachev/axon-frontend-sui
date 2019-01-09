@@ -1,0 +1,48 @@
+
+<a class="item labeled openbtn" (click)="toggleSidebar.emit()">
+  <i class="bars icon"></i>
+</a>
+<a class="item header" routerLink="/">Annette Axon </a>
+
+<div class="right menu">
+  <div class="ui primary dropdown button" suiDropdown >
+    <div class="text">{{ settings?.language.toUpperCase() }}</div>
+    <i class="dropdown icon"></i>
+    <div class="menu" suiDropdownMenu>
+      <a class="item" *ngFor="let lang of languages" (click)="onLanguageSelect(lang)">
+        {{ lang.toUpperCase() }}</a>
+    </div>
+  </div>
+
+  <div class="ui primary dropdown button" suiDropdown >
+    <div class="text">{{kcProfile?.firstName}} {{kcProfile?.lastName}}</div>
+    <i class="dropdown icon"></i>
+    <div class="menu" suiDropdownMenu>
+      <a class="item" (click)="onProfileClick()">
+        <i class="user icon"></i>
+        {{ 'axon.menu.profile' | translate }}</a>
+      <a class="item" routerLink="/settings">
+        <i class="cog icon"></i>
+        {{ 'axon.menu.settings' | translate }}</a>
+      <a class="item" (click)="onLogoutClick()">
+        <i class="power off icon"></i>
+        {{ 'axon.menu.logout' | translate }}</a>
+    </div>
+  </div>
+</div>
+
+<!--
+
+<button mat-menu-item (click)="onProfileClick()">
+  <mat-icon fontSet="fas" fontIcon="fa-user"></mat-icon>
+  <span>{{ 'axon.menu.profile' | translate }}</span>
+</button>
+<button mat-menu-item routerLink="/settings">
+  <mat-icon fontSet="fas" fontIcon="fa-cog"></mat-icon>
+  <span>{{ 'axon.menu.settings' | translate }}</span>
+</button>
+<button mat-menu-item (click)="onLogoutClick()">
+  <mat-icon fontSet="fas" fontIcon="fa-power-off"></mat-icon>
+  <span>{{ 'axon.menu.logout' | translate }}</span>
+</button>
+-->

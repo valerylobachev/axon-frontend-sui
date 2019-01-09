@@ -1,0 +1,52 @@
+:host {
+  bottom: 0;
+  border-radius: 0 !important;
+  border-width: 0 1px 0 0;
+  box-shadow: none;
+  margin: 0;
+  width: 100% !important;
+  height: 100%;
+}
+
+.item {
+  width: 100% !important;
+}
+
+
+.title-icon {
+  float: left !important;
+  margin: 0 10px 0 0 !important;
+}
+
+
+:host .item>i.icon {
+  width: 1.18em;
+  float: none;
+  margin: 0 .35714286em 0 0;
+}
+
+:host .item>i.icon.caret-icon {
+  width: 1.18em;
+  float: right;
+  margin: 0 0 0 .5em;
+}
+
+:host .menu .item {
+  background: 0 0;
+  padding: .92857143em 1.14285714em;
+  font-size: 1rem;
+  color: rgba(0,0,0,.87);
+  padding-left: 2rem;
+}
+
+:host .menu a.item:hover {
+  cursor: pointer;
+  background: rgba(0,0,0,.03);
+  color: rgba(0,0,0,.95);
+}
+
+:host .item .menu .active.item {
+  background: rgba(0,0,0,.05);
+  border-radius: 0;
+  box-shadow: none;
+}

@@ -1,0 +1,59 @@
+<div class="ui equal width left aligned padded grid stackable">
+  <div class="row">
+    <div class="sixteen wide column">
+      <div class="ui segments">
+        <div class="ui segment">
+          <div class="ui left floated header">
+            <h3 *ngIf="action == 'create'">{{ 'axon.bpm-config.schema.createTitle' | translate }}</h3>
+            <h3 *ngIf="action == 'view'">{{ 'axon.bpm-config.schema.viewTitle' | translate }}</h3>
+            <h3 *ngIf="action == 'update'">{{ 'axon.bpm-config.schema.updateTitle' | translate }}</h3>
+          </div>
+          <div class="ui right floated header">
+            <button class="ui basic button" routerLink="../../../schemas">Schemas</button>
+            <button class="ui primary button" *ngIf="action != 'view'" (click)="save()">Save</button>
+          </div>
+          <div style="display: block; height: 36px;">&nbsp;</div>
+        </div>
+
+        <div class="ui segment" style="padding: 0px;">
+
+          <div class="ui negative message"
+               style="margin-left: 14px; margin-right: 14px; margin-top: 14px;"
+               *ngIf="savingFailure" >
+            <p>{{ savingFailure.code | translate: savingFailure }}</p>
+          </div>
+
+          <axon-bpmn-edit #bpmnEdit [schema]="schema.schema"></axon-bpmn-edit>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!--
+<mat-card>
+  <mat-card-title fxLayout="row" fxLayoutAlign="start center">
+    <h3 *ngIf="action == 'create'">{{ 'axon.bpm-config.schema.createTitle' | translate }}</h3>
+    <h3 *ngIf="action == 'view'">{{ 'axon.bpm-config.schema.viewTitle' | translate }}</h3>
+    <h3 *ngIf="action == 'update'">{{ 'axon.bpm-config.schema.updateTitle' | translate }}</h3>
+    <div fxFlex></div>
+    <div class="button-row">
+      <button mat-stroked-button routerLink="../../../schemas">Schemas</button>
+      <button mat-flat-button *ngIf="action != 'view'" (click)="save()">Save</button>
+    </div>
+  </mat-card-title>
+  <mat-card-content>
+
+    <mat-tab-group>
+      <mat-tab label="Info"> Content 1 </mat-tab>
+      <mat-tab label="Design">
+        <axon-bpmn-edit #bpmnEdit [schema]="schema.schema"></axon-bpmn-edit>
+
+      </mat-tab>
+    </mat-tab-group>
+  </mat-card-content>
+</mat-card>
+
+-->
