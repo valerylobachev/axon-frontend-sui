@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from '@angular/common/http'
-import {Schema, SchemaSummary} from 'app/axon/bpm/shared/services/model'
+import {Schema, SchemaSummary} from 'app/axon/bpm/shared/services/schema.model'
 import {Observable} from 'rxjs'
 
 const SERVICE_BASE = '/web-api/bpm/config'
@@ -21,12 +21,12 @@ export class SchemaBackendService {
     return this.httpClient.post<SchemaSummary[]>(`${SERVICE_BASE}/schemas`, { filter: filter })
   }
 
-  create(xml: string) {
-    return this.httpClient.post<Schema>(`${SERVICE_BASE}/schema`, { xml: xml } )
+  create(schema: Schema) {
+    return this.httpClient.post<Schema>(`${SERVICE_BASE}/schema`, schema )
   }
 
-  update(xml: string) {
-    return this.httpClient.put<Schema>(`${SERVICE_BASE}/schema`, { xml: xml } )
+  update(schema: Schema) {
+    return this.httpClient.put<Schema>(`${SERVICE_BASE}/schema`, schema )
   }
 
   delete(id: string) {

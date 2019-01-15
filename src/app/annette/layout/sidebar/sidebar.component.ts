@@ -6,7 +6,7 @@ import {Component, HostBinding, OnInit} from '@angular/core';
   styleUrls: ['./sidebar.component.scss']
 })
 export class SidebarComponent implements OnInit {
-  @HostBinding('attr.class') classes = 'ui  inverted '
+  @HostBinding('attr.class') classes = ' '
   constructor() { }
 
   ngOnInit() {

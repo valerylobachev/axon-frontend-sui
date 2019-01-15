@@ -1,36 +1,12 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
-import {ActivatedRoute} from '@angular/router'
-import {SchemaBackendService} from '../../shared/services/schema-backend.service'
-import {Schema} from '../../shared/services/model'
-import {CreateSchema, UpdateSchema} from '../../shared/services/schema.actions'
+import {Component, HostListener, OnInit, ViewChild} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {SchemaBackendService} from '@app/axon/bpm/shared/services/schema-backend.service';
+import {CreateSchema, InitSchema, UpdateSchema} from '@app/axon/bpm/shared/services/schema.actions';
 import {select, Store} from '@ngrx/store';
-import {BpmnEditComponent} from './bpmn-view/bpmn-edit.component'
+import {BpmnEditComponent} from './bpmn-view/bpmn-edit.component';
 import * as fromSchema from '@app/axon/bpm/shared/services/schema.reducer';
+import {AbstractControl, FormBuilder, FormGroup, Validators} from '@angular/forms';
 
-const NEW_SCHEMA: Schema = {
-  id: '',
-  name: '',
-  description: '',
-  notation: 'BPMN',
-  schema: '<?xml version="1.0" encoding="UTF-8"?>\n' +
-      '<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" ' +
-      'xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" ' +
-      'xmlns:di="http://www.omg.org/spec/DD/20100524/DI" ' +
-      'xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" ' +
-      'id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" ' +
-      'exporter="Camunda Modeler" exporterVersion="1.11.3">\n' +
-      '  <bpmn:process id="process" isExecutable="true">\n' +
-      '    <bpmn:startEvent id="StartEvent_1" />\n' +
-      '  </bpmn:process>\n' +
-      '  <bpmndi:BPMNDiagram id="BPMNDiagram_1">\n' +
-      '    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="process">\n' +
-      '      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">\n' +
-      '        <dc:Bounds x="173" y="102" width="36" height="36" />\n' +
-      '      </bpmndi:BPMNShape>\n' +
-      '    </bpmndi:BPMNPlane>\n' +
-      '  </bpmndi:BPMNDiagram>\n' +
-      '</bpmn:definitions>'
-};
 
 @Component({
   selector: 'axon-schema',
@@ -41,99 +17,143 @@ export class SchemaComponent implements OnInit {
 
   @ViewChild('bpmnEdit') bpmnEdit: BpmnEditComponent;
 
+  formGroup: FormGroup;
+  idControl: AbstractControl;
+  nameControl: AbstractControl;
+  descriptionControl: AbstractControl;
+  notationControl: AbstractControl;
+  xmlControl: AbstractControl;
+  processDefinitionsControl: AbstractControl;
+
   action = '';
   id = '';
-  schema: Schema = {
-    id: '',
-    name: '',
-    description: '',
-    notation: 'BPMN',
-    schema: null
-  };
-  showSchema = false;
-  private savingFailure: any;
 
+  loading = true;
+  saving = false;
+  saved = false;
+  failure: any;
 
+  designerActive = false;
 
   constructor(
-      private schemaBackend: SchemaBackendService,
-      private activatedRoute: ActivatedRoute,
-      private store: Store<any>
+    private schemaBackend: SchemaBackendService,
+    private activatedRoute: ActivatedRoute,
+    private router: Router,
+    private fb: FormBuilder,
+    private store: Store<any>
   ) {
-    this.activatedRoute.params.subscribe(params => {
-      this.update(params['action'], params['id'])
+    this.formGroup = this.fb.group({
+      'id': [''],
+      'name': ['', Validators.required],
+      'description': [''],
+      'notation': ['BPMN'],
+      'xml': [''],
+      'processDefinitions': ['']
     });
+
+    this.idControl = this.formGroup.controls['id'];
+    this.nameControl = this.formGroup.controls['name'];
+    this.descriptionControl = this.formGroup.controls['description'];
+    this.notationControl = this.formGroup.controls['notation'];
+    this.xmlControl = this.formGroup.controls['xml'];
+    this.processDefinitionsControl = this.formGroup.controls['processDefinitions'];
+
   }
 
   ngOnInit() {
+    this.activatedRoute.params.subscribe(params => {
+      this.action = params['action'];
+      this.id = params['id'];
+      this.store.dispatch(new InitSchema({mode: this.action, id: this.id}));
+    });
 
     this.store
-      .pipe(select(fromSchema.selectSavingFailure))
-      .subscribe(
-        savingFailure => {
-          console.log(`savingFailure: `)
-          console.log(savingFailure)
-          if (savingFailure && savingFailure.error) {
-            this.savingFailure = savingFailure.error
+      .pipe(select(fromSchema.selectEntity))
+      .subscribe(entity => {
+        if (entity) {
+          this.formGroup.setValue(entity);
+        }
+      });
+
+    this.store
+      .pipe(select(fromSchema.selectLoadingState))
+      .subscribe(res => {
+        this.loading = res.loading;
+        if (res.loadingFailure && res.loadingFailure.error) {
+          this.failure = res.loadingFailure.error;
+        } else {
+          this.failure = null;
+        }
+      });
+
+    this.store
+      .pipe(select(fromSchema.selectSavingState))
+      .subscribe(res => {
+          console.log(`selectSavingAndSavingFailure: `);
+          console.log(res);
+          this.saving = res.saving;
+          this.saved = res.saved;
+
+          if (this.saved) {
+            this.formGroup.markAsUntouched();
+            this.formGroup.markAsPristine();
+          }
+
+          if (res.savingFailure && res.savingFailure.error) {
+            this.failure = res.savingFailure.error;
           } else {
-            this.savingFailure = null
+            this.failure = null;
           }
         }
-      )
+      );
   }
 
-  save() {
-    const newSchema: Schema = {
-      id: this.bpmnEdit.bpmnModel.getProcessId(),
-      name: this.bpmnEdit.bpmnModel.getName(),
-      description: this.bpmnEdit.bpmnModel.getDescription(),
-      notation: this.schema.notation,
-      schema: ''
-    };
-
-    const done = function (err, xml) {
-      if (err) {
-        console.log(err);
-      } else {
-        if (this.action === 'create') {
-          this.store.dispatch(new CreateSchema({schema: xml}));
-        } else if (this.action === 'update') {
-          newSchema.schema = xml;
-          this.store.dispatch(new UpdateSchema({
-            update:
-                {
-                  id: this.id,
-                  changes: newSchema
-                }
-          }));
-        }
-      }
-    };
-
-
-    this.bpmnEdit.bpmnModel.saveXML(done.bind(this));
-  }
-
-  update(action: string, id: string) {
-    this.action = action
-    this.id = id
-    if (id !== 'new') {
-      this.showSchema = false
-      // console.log('loading schema...')
-      this.schemaBackend.findById(id)
-          .subscribe(
-              schema => {
-                // console.log(schema)
-                this.schema = schema
-                this.showSchema = true
-              },
-              failure =>
-                  console.log(failure)
-          );
+  @HostListener('window:beforeunload', ['$event'])
+  unloadNotification($event: any) {
+    if (this.formGroup.dirty) {
+      $event.returnValue = 'Schema changed. Are you sure to leave?';
     } else {
-      this.schema = NEW_SCHEMA;
-      this.showSchema = true;
+      $event.returnValue = true;
     }
   }
 
+  save() {
+    this.saved = false;
+    const done = () => {
+      if (this.action === 'create') {
+        this.store.dispatch(new CreateSchema({schema: this.formGroup.value}));
+      } else if (this.action === 'update') {
+        this.store.dispatch(new UpdateSchema({
+          schema: this.formGroup.value
+        }));
+      }
+    };
+    if (this.designerActive) {
+      this.updateXml(done);
+    } else {
+      done();
+    }
+
+  }
+
+
+  updateXml(callback) {
+    this.bpmnEdit.bpmnModel.saveXML((err, xml) => {
+        this.xmlControl.setValue(xml);
+        this.processDefinitionsControl.setValue(this.bpmnEdit.bpmnModel.getProcessId());
+        if (callback) {
+          callback();
+        }
+      }
+    );
+  }
+
+  processDefinitionsList() {
+    const processDefinitions = this.processDefinitionsControl.value;
+    if (processDefinitions && processDefinitions.length > 0) {
+      return processDefinitions.split(' ');
+    } else {
+      return [];
+    }
+  }
 }

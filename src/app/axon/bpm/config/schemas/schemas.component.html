@@ -8,57 +8,89 @@
         <div class="ui segment">
           <div class="ui stackable grid">
             <div class="row">
-              <div class="fourteen wide column">
-                <div class="ui icon input" style="width: 100%;">
+              <div class="ten wide column">
+                <div class="ui icon action input" style="width: 100%;">
                   <input type="text" placeholder="Filter..." [value]="filter" [formControl]="filterControl">
                   <i class=" close link icon"
-                     style="right: 1.6em; width: 2em;"
+                     style="right: 2.6em; width: 2em;"
                      (click)="clearFilter()"></i>
-                  <i class=" search link icon"
-                     style="width: 2em;"
-                     (click)="$event.stopPropagation(); refresh()"></i>
+                  <button class="ui icon button" (click)="$event.stopPropagation(); refresh()">
+                    <i class="search icon"></i>
+                  </button>
                 </div>
               </div>
-              <div class="two wide column">
-                <a class="ui primary button" routerLink="../schema/create/new">Create</a>
+              <div class="right floated three wide column">
+                <div class="ui right floated primary buttons">
+                  <a class="ui primary button" routerLink="../schema/create/BPMN">Create BPMN</a>
+                  <div class="ui floating dropdown icon button" suiDropdown>
+                    <i class="dropdown icon"></i>
+                    <div class="menu" suiDropdownMenu>
+                      <a class="item" routerLink="../schema/create/DMN">Create DMN</a>
+                      <a class="item" routerLink="../schema/create/CMMN">Create CMMN</a>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-        <div class="ui segment">
+        <div class="ui segment" *ngIf="failure">
 
-          <div class="ui negative message" *ngIf="loadingFailure">
-            <p> {{ loadingFailure.code | translate: loadingFailure }}</p>
+          <div class="ui negative message">
+            <p> {{ failure.code | translate: failure }}</p>
           </div>
-
-          <table class="ui fixed single line striped table" *ngIf="!loadingFailure">
+        </div>
+        <div class="ui segment" *ngIf="!failure && schemas.length > 0">
+          <table class="ui selectable fixed single line striped table">
             <thead>
             <tr>
-              <th>Id</th>
-              <th>Name</th>
-              <th>Description</th>
-              <th>Notation</th>
+              <th (click)="toggleSort('name')">
+                Name
+                <i class="sort up icon" *ngIf="sortField === 'name' && sortAscending"></i>
+                <i class="sort down icon" *ngIf="sortField === 'name' && !sortAscending"></i>
+              </th>
+              <th (click)="toggleSort('description')">
+                Description
+                <i class="sort up icon" *ngIf="sortField === 'description' && sortAscending"></i>
+                <i class="sort down icon" *ngIf="sortField === 'description' && !sortAscending"></i>
+              </th>
+              <th (click)="toggleSort('notation')">
+                Notation
+                <i class="sort up icon" *ngIf="sortField === 'notation' && sortAscending"></i>
+                <i class="sort down icon" *ngIf="sortField === 'notation' && !sortAscending"></i>
+              </th>
+              <th (click)="toggleSort('processDefinitions')">
+                Process Def. Ids
+                <i class="sort up icon" *ngIf="sortField === 'id' && sortAscending"></i>
+                <i class="sort down icon" *ngIf="sortField === 'id' && !sortAscending"></i>
+              </th>
               <th>Actions</th>
             </tr>
             </thead>
             <tbody>
             <tr *ngFor="let schema of schemas">
-              <td>{{ schema.id }}</td>
-              <td>{{ schema.name }}</td>
+              <td><a [routerLink]="['../schema/view', schema.id]">{{ schema.name }}</a></td>
               <td>{{ schema.description }}</td>
-              <td>{{ schema.notation }}</td>
+              <td>
+                <div class="ui basic label">{{ schema.notation }}</div>
+              </td>
+              <td>
+                <div class="ui small labels" *ngIf="schema.notation === 'BPMN'">
+                  <a class="ui label" *ngFor="let pd of processDefinitionsList(schema)">{{ pd }}</a>
+                </div>
+              </td>
               <td>
 
-                <a class="ui tiny basic icon button" [routerLink]="['../schema/view', schema.id]">
-                  <i class="eye green icon"></i>
+                <a class="ui tiny basic icon button" [routerLink]="['../schema/create', schema.id]">
+                  <i class="copy outline green icon"></i>
                 </a>
                 <a class="ui tiny basic icon button" [routerLink]="['../schema/update', schema.id]">
-                  <i class="edit blue icon" ></i>
+                  <i class="edit blue icon"></i>
                 </a>
                 <button class="ui tiny basic icon button">
-                  <i class="upload violet icon"  ></i>
+                  <i class="upload violet icon"></i>
                 </button>
-                <button class="ui tiny basic icon button" (click)="delete(schema.id)">
+                <button class="ui tiny basic icon button" (click)="delete(schema.id, schema.name)">
                   <i class="delete red icon"></i>
                 </button>
 
@@ -67,7 +99,25 @@
             </tbody>
           </table>
         </div>
+        <div class="ui placeholder segment" *ngIf="!failure && schemas.length == 0">
+          <div class="ui icon header">
+            <i class="object group outline icon"></i>
+            No schema has been found.
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
+
+
+<ng-template class="qqq" let-context let-modal="modal" #modalTemplate>
+  <div class="header">Delete</div>
+  <div class="content">
+    <p>Are you sure to delete schema {{ context.name }}?</p>
+  </div>
+  <div class="actions">
+    <button class="ui basic button" (click)="modal.deny()">Cancel</button>
+    <button class="ui red button" (click)="modal.approve('done')" autofocus>Delete</button>
+  </div>
+</ng-template>

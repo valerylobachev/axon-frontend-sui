@@ -1,59 +1,117 @@
 <div class="ui equal width left aligned padded grid stackable">
   <div class="row">
     <div class="sixteen wide column">
-      <div class="ui segments">
+      <div class="ui segments" style="background-color: white">
         <div class="ui segment">
-          <div class="ui left floated header">
-            <h3 *ngIf="action == 'create'">{{ 'axon.bpm-config.schema.createTitle' | translate }}</h3>
-            <h3 *ngIf="action == 'view'">{{ 'axon.bpm-config.schema.viewTitle' | translate }}</h3>
-            <h3 *ngIf="action == 'update'">{{ 'axon.bpm-config.schema.updateTitle' | translate }}</h3>
-          </div>
-          <div class="ui right floated header">
-            <button class="ui basic button" routerLink="../../../schemas">Schemas</button>
-            <button class="ui primary button" *ngIf="action != 'view'" (click)="save()">Save</button>
-          </div>
-          <div style="display: block; height: 36px;">&nbsp;</div>
+          <h3 *ngIf="action == 'create'">{{ 'axon.bpm-config.schema.createTitle' | translate }}</h3>
+          <h3 *ngIf="action == 'view'">{{ 'axon.bpm-config.schema.viewTitle' | translate }}</h3>
+          <h3 *ngIf="action == 'update'">{{ 'axon.bpm-config.schema.updateTitle' | translate }}</h3>
         </div>
 
-        <div class="ui segment" style="padding: 0px;">
+        <div class="ui segment" >
+          <div class="ui stackable grid">
+            <div class="row">
+              <div class="ten wide computer column eight wide tablet column">
+                <div class="ui green basic label" *ngIf="formGroup.dirty && action !== 'view'">Schema changed</div>
+                <div class="ui green basic label" *ngIf="saved && !formGroup.dirty && action !== 'view'">Saved</div>
+                <div class="ui red label" *ngIf="nameControl.hasError('required') && action !== 'view'">Name required</div>
+                <div class="ui red label" *ngIf="xmlControl.hasError('required') && action !== 'view'">XML required</div>
+              </div>
+              <div class="six wide computer column eight wide tablet column">
+                <div class="ui right floated header">
+                  <button class="ui basic button"
+                          routerLink="../../../schemas"
+                          [disabled]="formGroup.dirty">Schemas</button>
+                  <a class="ui basic button"
+                     *ngIf="action == 'view'"
+                     [routerLink]="['../../../schema/update', idControl.value]">Edit</a>
+                  <button class="ui basic button"
+                          *ngIf="action == 'update'"
+                     [routerLink]="['../../../schema/view', idControl.value]"
+                     [disabled]="formGroup.dirty">View</button>
+                  <button class="ui primary button"
+                          *ngIf="action != 'view'"
+                          [disabled]="!formGroup.valid"
+                          (click)="save()">Save</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
+        <div class="ui segment" style="padding: 0px;" [class.loading]="loading">
           <div class="ui negative message"
                style="margin-left: 14px; margin-right: 14px; margin-top: 14px;"
-               *ngIf="savingFailure" >
-            <p>{{ savingFailure.code | translate: savingFailure }}</p>
+               *ngIf="failure">
+            <p>{{ failure.code | translate: failure }}</p>
           </div>
+          <form class="ui form"
+                [formGroup]="formGroup"
+                [class.error]="!formGroup.valid && formGroup.touched">
 
-          <axon-bpmn-edit #bpmnEdit [schema]="schema.schema"></axon-bpmn-edit>
+            <sui-tabset style="height: 100%">
+              <div class="ui secondary pointing menu">
+                <a class="item" suiTabHeader="info">Info</a>
+                <a class="item" suiTabHeader="designer"
+                   *ngIf="notationControl.value == 'BPMN'"
+                   [(isActive)]="designerActive"
+                   (deactivate)="updateXml()">Designer</a>
+                <a class="item" suiTabHeader="xml">XML</a>
+              </div>
+              <div class="ui bottom attached basic segment" suiTabContent="info" style="border: 0px; margin: 0px;">
+
+                <div class="field"
+                     [class.error]="!nameControl.valid && nameControl.touched">
+                  <label>Name</label>
+                  <input type="text" name="name" placeholder="Name"
+                         [formControl]="nameControl"
+                         [readOnly]="action == 'view'">
+                  <div *ngIf="nameControl.hasError('required')"
+                       class="ui error message">Name is required
+                  </div>
+                </div>
+                <div class="field">
+                  <label>Description</label>
+                  <textarea name="description" placeholder="Description"
+                            [formControl]="descriptionControl"
+                            [readOnly]="action == 'view'"></textarea>
+                </div>
+                <div class="field">
+                  <label>Notation</label>
+                  <div class="ui blue label">{{ notationControl.value }}</div>
+                </div>
+                <div class="field" *ngIf="notationControl.value === 'BPMN'">
+                  <label>Process defininions</label>
+                  <div class="ui small labels">
+                    <a class="ui label" *ngFor="let pd of processDefinitionsList()">{{ pd }}</a>
+                  </div>
+                </div>
+              </div>
+              <div class="ui bottom attached basic segment"
+                   suiTabContent="designer"
+                   *ngIf="notationControl.value == 'BPMN'">
+                <axon-bpmn-edit #bpmnEdit [schema]="xmlControl.value"></axon-bpmn-edit>
+              </div>
+              <div class="ui bottom attached basic segment" suiTabContent="xml">
+
+                <div class="field"
+                     [class.error]="!xmlControl.valid && xmlControl.touched">
+                  <textarea name="xml" placeholder="XML"
+                            [formControl]="xmlControl"
+                            [readOnly]="action == 'view'"></textarea>
+                  <div *ngIf="xmlControl.hasError('required')"
+                       class="ui error message">XML is required
+                  </div>
+                </div>
+
+              </div>
+            </sui-tabset>
+          </form>
         </div>
+
 
       </div>
     </div>
   </div>
 </div>
 
-
-<!--
-<mat-card>
-  <mat-card-title fxLayout="row" fxLayoutAlign="start center">
-    <h3 *ngIf="action == 'create'">{{ 'axon.bpm-config.schema.createTitle' | translate }}</h3>
-    <h3 *ngIf="action == 'view'">{{ 'axon.bpm-config.schema.viewTitle' | translate }}</h3>
-    <h3 *ngIf="action == 'update'">{{ 'axon.bpm-config.schema.updateTitle' | translate }}</h3>
-    <div fxFlex></div>
-    <div class="button-row">
-      <button mat-stroked-button routerLink="../../../schemas">Schemas</button>
-      <button mat-flat-button *ngIf="action != 'view'" (click)="save()">Save</button>
-    </div>
-  </mat-card-title>
-  <mat-card-content>
-
-    <mat-tab-group>
-      <mat-tab label="Info"> Content 1 </mat-tab>
-      <mat-tab label="Design">
-        <axon-bpmn-edit #bpmnEdit [schema]="schema.schema"></axon-bpmn-edit>
-
-      </mat-tab>
-    </mat-tab-group>
-  </mat-card-content>
-</mat-card>
-
--->

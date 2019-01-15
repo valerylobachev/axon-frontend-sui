@@ -46,10 +46,10 @@ export class LayoutComponent implements OnInit, OnDestroy {
 
   @ViewChild('sidemenu')
   sidemenu;
-  @ViewChild(PerfectScrollbarDirective)
-  directiveScroll: PerfectScrollbarDirective;
-
-  public config: PerfectScrollbarConfigInterface = {};
+  // @ViewChild(PerfectScrollbarDirective)
+  // directiveScroll: PerfectScrollbarDirective;
+  //
+  // public config: PerfectScrollbarConfigInterface = {};
 
   menuItems: Menu[] = MENUITEMS;
 
@@ -154,7 +154,7 @@ export class LayoutComponent implements OnInit, OnDestroy {
   updatePS(): void {
     if (!this.mediaMatcher.matches && !this.options.compact) {
       setTimeout(() => {
-        this.directiveScroll.update();
+       // this.directiveScroll.update();
       }, 350);
     }
   }

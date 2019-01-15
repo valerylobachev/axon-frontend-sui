@@ -27,6 +27,7 @@
     "@ngx-loading-bar/router": "^3.0.0",
     "@ngx-translate/core": "^11.0.1",
     "@ngx-translate/http-loader": "^4.0.0",
+    "angular2-uuid": "^1.1.1",
     "bpmn-js": "^3.0.4",
     "bpmn-js-properties-panel": "^0.28.2",
     "bpmn-moddle": "^5.1.6",
